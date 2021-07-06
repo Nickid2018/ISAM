@@ -16,13 +16,33 @@
  */
 package com.github.isam;
 
-public class Main {
+import com.github.isam.render.*;
 
-	/**
-	 * The entrance of the new world
-	 */
+public class ISAM {
+
+	private Renderer renderer;
+	private Window window;
+	
+	private static ISAM instance;
+
 	public static void main(String[] args) {
-
+		instance = new ISAM();
+		instance.initGLAndRun();
+	}
+	
+	private ISAM() {
+		
+	}
+	
+	private void initGLAndRun() {
+		
+	}
+	
+	public static ISAM getInstance() {
+		return instance;
 	}
 
+	public Renderer getRenderer() {
+		return renderer;
+	}
 }
