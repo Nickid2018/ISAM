@@ -44,8 +44,10 @@ public class VertexArray {
 
 	public void upload() {
 		glBindVertexArray(id);
-		ebo.upload();
 		vbo.upload();
+		if (ebo != null)
+			ebo.upload();
+		vbo.setPointers();
 		glBindVertexArray(0);
 	}
 
@@ -55,6 +57,6 @@ public class VertexArray {
 		if (ebo == null)
 			glDrawArrays(GL_TRIANGLES, 0, vbo.getVertexes());
 		else
-			glDrawElements(GL_TRIANGLES, ebo.getTriangles(), GL_UNSIGNED_INT, 0);
+			glDrawElements(GL_TRIANGLES, ebo.getTriangles() * 3, GL_UNSIGNED_INT, 0);
 	}
 }

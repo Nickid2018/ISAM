@@ -18,14 +18,14 @@ package com.github.isam.render.texture;
 
 import java.io.*;
 import java.nio.*;
+
+import org.lwjgl.stb.STBImage;
 import org.lwjgl.system.*;
 
 import com.github.isam.render.window.Window;
 
 import java.nio.channels.*;
 
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL12.*;
 import static org.lwjgl.opengl.GL14.*;
 
 public class TextureUtil {
@@ -38,23 +38,23 @@ public class TextureUtil {
 		glDeleteTextures(id);
 	}
 
-	private static void bind(int id) {
+	public static void bind(int id) {
 		glBindTexture(GL_TEXTURE_2D, id);
 	}
 
 	public static void prepareImage(int id, int width, int height) {
-		prepareImage(Texture.InternalGlFormat.RGBA, id, 0, width, height);
+		prepareImage(Image.InternalGlFormat.RGBA, id, 0, width, height);
 	}
 
-	public static void prepareImage(Texture.InternalGlFormat format, int id, int width, int height) {
+	public static void prepareImage(Image.InternalGlFormat format, int id, int width, int height) {
 		prepareImage(format, id, 0, width, height);
 	}
 
 	public static void prepareImage(int id, int mipmap, int width, int height) {
-		prepareImage(Texture.InternalGlFormat.RGBA, id, mipmap, width, height);
+		prepareImage(Image.InternalGlFormat.RGBA, id, mipmap, width, height);
 	}
 
-	public static void prepareImage(Texture.InternalGlFormat format, int id, int mipmap, int width, int height) {
+	public static void prepareImage(Image.InternalGlFormat format, int id, int mipmap, int width, int height) {
 		bind(id);
 		if (mipmap >= 0) {
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, mipmap);
@@ -91,7 +91,7 @@ public class TextureUtil {
 			String file = path + "_" + level + ".png";
 			int sizeX = width >> level;
 			int sizeY = height >> level;
-			try (Texture texture = new Texture(sizeX, sizeY, false)) {
+			try (Image texture = new Image(sizeX, sizeY, false)) {
 				texture.downloadTexture(level, false);
 				texture.writeToFile(file);
 				Window.LOGGER.debug("Exported png to: " + new File(file).getAbsolutePath());
@@ -113,5 +113,9 @@ public class TextureUtil {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	}
+
+	static {
+		STBImage.stbi_set_flip_vertically_on_load(true);
 	}
 }

@@ -25,7 +25,7 @@ public class ElementBuffer {
 	private int id;
 	private int mode;
 	private IntBuffer indices;
-	private int triangles;
+	private int triangles = 0;
 
 	public ElementBuffer(int size) {
 		this(size, GL_STATIC_DRAW);

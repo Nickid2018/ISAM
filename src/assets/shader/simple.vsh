@@ -8,7 +8,7 @@ out vec2 outUV;
 
 void main()
 {
-	gl_Position = vec4(position.xyz, 1.0);
+	gl_Position = vec4(position, 1.0);
 	outColor = color;
 	outUV = uv;
 }

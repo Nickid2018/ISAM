@@ -23,11 +23,9 @@ import org.lwjgl.stb.*;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
-
-import com.github.isam.render.texture.TextureUtil;
-
 import javax.annotation.*;
 import org.apache.log4j.*;
+import com.github.isam.render.texture.*;
 
 public class Window implements AutoCloseable {
 
@@ -179,6 +177,11 @@ public class Window implements AutoCloseable {
 		for (now = GLFW.glfwGetTime(); now < frameLength; now = GLFW.glfwGetTime())
 			GLFW.glfwWaitEventsTimeout(frameLength - now);
 		lastDrawTime = now;
+	}
+	
+	public void clear() {
+		GL11.glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+	    GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
 	}
 
 	public void close() {

@@ -16,7 +16,15 @@
  */
 package com.github.isam;
 
+import java.io.IOException;
+
 import com.github.isam.render.*;
+import com.github.isam.render.shader.Shaders;
+import com.github.isam.render.texture.Image;
+import com.github.isam.render.texture.Texture;
+import com.github.isam.render.vertex.ElementBuffer;
+import com.github.isam.render.vertex.VertexArray;
+import com.github.isam.render.vertex.VertexBuffer;
 import com.github.isam.render.window.*;
 
 public class ISAM {
@@ -35,12 +43,13 @@ public class ISAM {
 
 	}
 
+	// This is a test of rendering
 	private void initGLAndRun() {
 		DisplayData data = new DisplayData();
 		data.frameLimit = 60;
-		data.fullScreen = false;
+		data.fullScreen = true;
 		data.vsync = true;
-		data.width = 800;
+		data.width = 650;
 		data.height = 600;
 		window = new Window("ISAM", data, new WindowEventListener() {
 
@@ -55,9 +64,34 @@ public class ISAM {
 			}
 		});
 		Thread.currentThread().setName("Render Thread");
+		Image texture;
+		try {
+			texture = Image.read(ISAM.class.getResourceAsStream("/assets/textures/ksm128128.png"));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		Texture tex = new Texture(texture, 0).setLinear(true).update();
+		// Test VAO
+		VertexBuffer buffer = new VertexBuffer(4);
+		buffer.pos(0.5f, 0.5f, 0).color(1, 0, 0).uv(1, 1).endVertex();
+		buffer.pos(0.5f, -0.5f, 0).color(0, 1, 0).uv(1, 0).endVertex();
+		buffer.pos(-0.5f, -0.5f, 0).color(0, 0, 1).uv(0, 0).endVertex();
+		buffer.pos(-0.5f, 0.5f, 0).color(1, 1, 1).uv(0, 1).endVertex();
+		ElementBuffer ebo = new ElementBuffer(2);
+		ebo.putTriangle(0, 1, 3);
+		ebo.putTriangle(1, 2, 3);
+		VertexArray array = new VertexArray(Shaders.SIMPLE);
+		array.bindVBO(buffer);
+		array.bindEBO(ebo);
+		array.upload();
 		while (!window.shouldClose()) {
+			window.clear();
+			tex.activeAndBind(0);
+			array.render();
+			window.updateDisplay(false);
 			window.limitDisplayFPS();
 		}
+		window.close();
 	}
 
 	public static ISAM getInstance() {

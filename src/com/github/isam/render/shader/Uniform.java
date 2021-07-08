@@ -80,20 +80,22 @@ public class Uniform {
 		dirty = true;
 	}
 
-	public void setInt(int... data) {
-		Preconditions.checkArgument(data.length != type.count);
+	public Uniform setInt(int... data) {
+		Preconditions.checkArgument(data.length == type.count);
 		Preconditions.checkState(ibuf != null);
 		ibuf.position(0);
 		ibuf.put(data);
 		markDirty();
+		return this;
 	}
 
-	public void setFloat(float... data) {
-		Preconditions.checkArgument(data.length != type.count);
+	public Uniform setFloat(float... data) {
+		Preconditions.checkArgument(data.length == type.count);
 		Preconditions.checkState(fbuf != null);
 		fbuf.position(0);
 		fbuf.put(data);
 		markDirty();
+		return this;
 	}
 
 	public void upload() {

@@ -27,6 +27,10 @@ public class VertexBuffer {
 	private FloatBuffer vertices;
 	private int nowVertexes = 0;
 
+	public VertexBuffer(int vertextes) {
+		this(8, vertextes);
+	}
+
 	public VertexBuffer(int size, int vertexes) {
 		this(size, vertexes, GL_STATIC_DRAW);
 	}
@@ -67,11 +71,11 @@ public class VertexBuffer {
 		vertices.put(u).put(v);
 		return this;
 	}
-	
+
 	public void endVertex() {
 		nowVertexes++;
 	}
-	
+
 	public int getVertexes() {
 		return nowVertexes;
 	}
@@ -82,11 +86,15 @@ public class VertexBuffer {
 		vertices.limit(pos);
 		glBindBuffer(GL_ARRAY_BUFFER, id);
 		glBufferData(GL_ARRAY_BUFFER, vertices, mode);
+		return this;
+	}
+	
+	public VertexBuffer setPointers() {
 		glVertexAttribPointer(0, 3, GL_FLOAT, false, 4 * 8, 0);
-		glVertexAttribPointer(1, 3, GL_FLOAT, false, 4 * 8, 4 * 3);
-		glVertexAttribPointer(2, 2, GL_FLOAT, false, 4 * 8, 4 * 6);
 		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(1, 3, GL_FLOAT, false, 4 * 8, 4 * 3);
 		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(2, 2, GL_FLOAT, false, 4 * 8, 4 * 6);
 		glEnableVertexAttribArray(2);
 		return this;
 	}

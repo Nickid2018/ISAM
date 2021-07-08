@@ -16,8 +16,11 @@
  */
 package com.github.isam.render.shader;
 
+import java.io.*;
 import java.util.*;
+import org.apache.commons.io.*;
 import com.google.common.collect.*;
+import com.google.common.base.Charsets;
 
 import static org.lwjgl.opengl.GL30.*;
 
@@ -30,12 +33,12 @@ public class ShaderProgram {
 		int vsId = glCreateShader(GL_VERTEX_SHADER);
 		glShaderSource(vsId, vertex);
 		glCompileShader(vsId);
-		if (glGetShaderi(id, vsId) == 0)
+		if (glGetShaderi(vsId, GL_COMPILE_STATUS) == 0)
 			throw new RuntimeException("Can't compile vertex shader: " + glGetShaderInfoLog(vsId));
 		int fsId = glCreateShader(GL_FRAGMENT_SHADER);
-		glShaderSource(fsId, vertex);
+		glShaderSource(fsId, frag);
 		glCompileShader(fsId);
-		if (glGetShaderi(id, fsId) == 0)
+		if (glGetShaderi(fsId, GL_COMPILE_STATUS) == 0)
 			throw new RuntimeException("Can't compile fragment shader: " + glGetShaderInfoLog(fsId));
 		id = glCreateProgram();
 		glAttachShader(id, vsId);
@@ -68,4 +71,9 @@ public class ShaderProgram {
 		return uniforms.get(name);
 	}
 
+	public static ShaderProgram createFromJAR(String vs, String fs, Uniform... uniforms) throws IOException {
+		String vss = IOUtils.resourceToString(vs, Charsets.UTF_8);
+		String fss = IOUtils.resourceToString(fs, Charsets.UTF_8);
+		return new ShaderProgram(vss, fss, uniforms);
+	}
 }
