@@ -70,6 +70,36 @@
   		<classifier>natives-windows</classifier>
   	</dependency>
   	<dependency>
+  		<groupId>org.lwjgl</groupId>
+  		<artifactId>lwjgl</artifactId>
+  		<version>3.2.3</version>
+  		<classifier>natives-windows-x86</classifier>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.lwjgl</groupId>
+  		<artifactId>lwjgl-glfw</artifactId>
+  		<version>3.2.3</version>
+  		<classifier>natives-windows-x86</classifier>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.lwjgl</groupId>
+  		<artifactId>lwjgl-opengl</artifactId>
+  		<version>3.2.3</version>
+  		<classifier>natives-windows-x86</classifier>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.lwjgl</groupId>
+  		<artifactId>lwjgl-openal</artifactId>
+  		<version>3.2.3</version>
+  		<classifier>natives-windows-x86</classifier>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.lwjgl</groupId>
+  		<artifactId>lwjgl-stb</artifactId>
+  		<version>3.2.3</version>
+  		<classifier>natives-windows-x86</classifier>
+  	</dependency>
+  	<dependency>
   		<groupId>log4j</groupId>
   		<artifactId>log4j</artifactId>
   		<version>1.2.17</version>

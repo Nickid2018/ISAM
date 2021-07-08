@@ -1,4 +1,4 @@
-package com.github.isam.render;
+package com.github.isam.render.window;
 
 import java.util.*;
 import org.lwjgl.glfw.*;

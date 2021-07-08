@@ -1,4 +1,4 @@
-package com.github.isam.render;
+package com.github.isam.render.window;
 
 public class DisplayData {
 
@@ -8,4 +8,6 @@ public class DisplayData {
 	public int width;
 	
 	public boolean vsync;
+	
+	public int frameLimit;
 }

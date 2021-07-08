@@ -17,27 +17,49 @@
 package com.github.isam;
 
 import com.github.isam.render.*;
+import com.github.isam.render.window.*;
 
 public class ISAM {
 
 	private Renderer renderer;
 	private Window window;
-	
+
 	private static ISAM instance;
 
 	public static void main(String[] args) {
 		instance = new ISAM();
 		instance.initGLAndRun();
 	}
-	
+
 	private ISAM() {
-		
+
 	}
-	
+
 	private void initGLAndRun() {
-		
+		DisplayData data = new DisplayData();
+		data.frameLimit = 60;
+		data.fullScreen = false;
+		data.vsync = true;
+		data.width = 800;
+		data.height = 600;
+		window = new Window("ISAM", data, new WindowEventListener() {
+
+			@Override
+			public void onResizeDisplay() {
+				System.out.println("resize!");
+			}
+
+			@Override
+			public void onFocus(boolean focus) {
+				System.out.println("focus update! " + focus);
+			}
+		});
+		Thread.currentThread().setName("Render Thread");
+		while (!window.shouldClose()) {
+			window.limitDisplayFPS();
+		}
 	}
-	
+
 	public static ISAM getInstance() {
 		return instance;
 	}
