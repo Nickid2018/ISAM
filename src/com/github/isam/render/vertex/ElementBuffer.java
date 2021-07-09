@@ -56,7 +56,7 @@ public class ElementBuffer {
 		indices.put(a).put(b).put(c);
 		return this;
 	}
-	
+
 	public int getTriangles() {
 		return triangles;
 	}

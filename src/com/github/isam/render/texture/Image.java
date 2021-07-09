@@ -113,8 +113,8 @@ public class Image implements AutoCloseable {
 					format == null ? 0 : format.components);
 			if (pixels == null)
 				throw new IOException("Could not load image: " + STBImage.stbi_failure_reason());
-			return new Image(format == null ? Format.getStbFormat(channel.get(0)) : format, width.get(0),
-					height.get(0), true, MemoryUtil.memAddress(pixels));
+			return new Image(format == null ? Format.getStbFormat(channel.get(0)) : format, width.get(0), height.get(0),
+					true, MemoryUtil.memAddress(pixels));
 		}
 	}
 

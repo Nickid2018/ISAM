@@ -24,16 +24,16 @@ import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
 import javax.annotation.*;
-import org.apache.log4j.*;
+import org.apache.logging.log4j.*;
 import com.github.isam.render.texture.*;
 
 public class Window implements AutoCloseable {
 
-	public static final Logger LOGGER = Logger.getLogger("Window");
+	public static final Logger LOGGER = LogManager.getLogger("Window");
 
 	// Strong reference
 	private static final GLFWErrorCallback ERR_CALLBACK = GLFWErrorCallback
-			.create((code, str) -> LOGGER.error("GL Error! [" + code + "] " + MemoryUtil.memUTF8(str)));
+			.create((code, str) -> LOGGER.error("GL Error! [{}] {}", code, MemoryUtil.memUTF8(str)));
 
 	private long handle;
 	@Nullable
@@ -106,7 +106,7 @@ public class Window implements AutoCloseable {
 	public int getHeight() {
 		return framebufferHeight;
 	}
-	
+
 	public boolean shouldClose() {
 		return GLFW.glfwWindowShouldClose(handle);
 	}
@@ -119,6 +119,7 @@ public class Window implements AutoCloseable {
 	public void onResize(long handle, int reWidth, int reHeight) {
 		width = reWidth;
 		height = reHeight;
+		GL11.glViewport(0, 0, width, height);
 	}
 
 	public void onFocus(long handle, boolean focus) {
@@ -170,7 +171,7 @@ public class Window implements AutoCloseable {
 	public int getFrameLimit() {
 		return frameLimit;
 	}
-	
+
 	public void limitDisplayFPS() {
 		double frameLength = lastDrawTime + 1.0D / frameLimit;
 		double now;
@@ -178,10 +179,10 @@ public class Window implements AutoCloseable {
 			GLFW.glfwWaitEventsTimeout(frameLength - now);
 		lastDrawTime = now;
 	}
-	
+
 	public void clear() {
 		GL11.glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-	    GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
+		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
 	}
 
 	public void close() {

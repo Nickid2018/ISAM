@@ -16,8 +16,13 @@
  */
 package com.github.isam;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL30;
+
+import com.github.isam.crash.CrashReport;
 import com.github.isam.render.*;
 import com.github.isam.render.shader.Shaders;
 import com.github.isam.render.texture.Image;
@@ -40,14 +45,14 @@ public class ISAM {
 	}
 
 	private ISAM() {
-
+		initializeThrowableListener();
 	}
 
 	// This is a test of rendering
 	private void initGLAndRun() {
 		DisplayData data = new DisplayData();
 		data.frameLimit = 60;
-		data.fullScreen = true;
+		data.fullScreen = false;
 		data.vsync = true;
 		data.width = 650;
 		data.height = 600;
@@ -63,20 +68,30 @@ public class ISAM {
 				System.out.println("focus update! " + focus);
 			}
 		});
+
 		Thread.currentThread().setName("Render Thread");
 		Image texture;
 		try {
-			texture = Image.read(ISAM.class.getResourceAsStream("/assets/textures/ksm128128.png"));
+			texture = Image.read(new FileInputStream("D:\\testFiles\\Popipa_12thSG.png"));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		Texture tex = new Texture(texture, 0).setLinear(true).update();
+		Texture tex = new Texture(texture, 4).setLinear(true).update();
+
+		Image texture2;
+		try {
+			texture2 = Image.read(new FileInputStream("D:\\testFiles\\ppp.png"));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		Texture tex2 = new Texture(texture2, 4).setLinear(true).update();
+
 		// Test VAO
-		VertexBuffer buffer = new VertexBuffer(4);
-		buffer.pos(0.5f, 0.5f, 0).color(1, 0, 0).uv(1, 1).endVertex();
-		buffer.pos(0.5f, -0.5f, 0).color(0, 1, 0).uv(1, 0).endVertex();
-		buffer.pos(-0.5f, -0.5f, 0).color(0, 0, 1).uv(0, 0).endVertex();
-		buffer.pos(-0.5f, 0.5f, 0).color(1, 1, 1).uv(0, 1).endVertex();
+		VertexBuffer buffer = new VertexBuffer(4, GL30.GL_STREAM_DRAW);
+		buffer.pos(0, 1, 0).color(1, 0, 0).uv(1, 1).endVertex();
+		buffer.pos(1, 0, 0).color(0, 1, 0).uv(1, 0).endVertex();
+		buffer.pos(0, -1, 0).color(0, 0, 1).uv(0, 0).endVertex();
+		buffer.pos(-1, 0, 0).color(1, 1, 1).uv(0, 1).endVertex();
 		ElementBuffer ebo = new ElementBuffer(2);
 		ebo.putTriangle(0, 1, 3);
 		ebo.putTriangle(1, 2, 3);
@@ -84,14 +99,56 @@ public class ISAM {
 		array.bindVBO(buffer);
 		array.bindEBO(ebo);
 		array.upload();
+
+		VertexBuffer buffer2 = new VertexBuffer(4);
+		buffer2.pos(1, 1, 0).color(0, 1, 1).uv(1, 1).endVertex();
+		buffer2.pos(1, -1, 0).color(1, 0, 1).uv(1, 0).endVertex();
+		buffer2.pos(-1, -1, 0).color(1, 1, 0).uv(0, 0).endVertex();
+		buffer2.pos(-1, 1, 0).color(1, 1, 1).uv(0, 1).endVertex();
+		ElementBuffer ebo2 = new ElementBuffer(2);
+		ebo2.putTriangle(0, 1, 3);
+		ebo2.putTriangle(1, 2, 3);
+		VertexArray array2 = new VertexArray(Shaders.SIMPLE);
+		array2.bindVBO(buffer2);
+		array2.bindEBO(ebo2);
+		array2.upload();
+
 		while (!window.shouldClose()) {
 			window.clear();
+
+			long time = System.currentTimeMillis() / 10L;
+			buffer.updateVertexPos(0, nowX(0, 1, time), nowY(0, 1, time), 0);
+			buffer.updateVertexPos(1, nowX(1, 0, time), nowY(1, 0, time), 0);
+			buffer.updateVertexPos(2, nowX(0, -1, time), nowY(0, -1, time), 0);
+			buffer.updateVertexPos(3, nowX(-1, 0, time), nowY(-1, 0, time), 0);
+
+			tex2.activeAndBind(0);
+			array2.render();
+			tex2.unbind();
+
+			GL11.glEnable(GL11.GL_ALPHA_TEST);
+			GL11.glAlphaFunc(GL11.GL_GREATER, 0.5f);
 			tex.activeAndBind(0);
 			array.render();
+			tex.unbind();
+			GL11.glDisable(GL11.GL_ALPHA_TEST);
+
 			window.updateDisplay(false);
 			window.limitDisplayFPS();
 		}
 		window.close();
+	}
+
+	public float nowX(float x, float y, long time) {
+		float sin = (float) Math.sin(Math.toRadians(time));
+		float cos = (float) Math.cos(Math.toRadians(time));
+		return cos * x - sin * y;
+	}
+
+	public float nowY(float x, float y, long time) {
+		float sin = (float) Math.sin(Math.toRadians(time));
+		float cos = (float) Math.cos(Math.toRadians(time));
+		return sin * x + cos * y;
 	}
 
 	public static ISAM getInstance() {
@@ -100,5 +157,13 @@ public class ISAM {
 
 	public Renderer getRenderer() {
 		return renderer;
+	}
+
+	public static void initializeThrowableListener() {
+		Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
+			CrashReport report = new CrashReport("Final throwable tracker", e);
+			report.writeToFile("plain");
+			System.exit(-1);
+		});
 	}
 }

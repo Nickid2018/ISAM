@@ -42,21 +42,30 @@ public class VertexArray {
 		return this;
 	}
 
-	public void upload() {
+	public void bind() {
 		glBindVertexArray(id);
+	}
+
+	public void unbind() {
+		glBindVertexArray(0);
+	}
+
+	public void upload() {
+		bind();
 		vbo.upload();
 		if (ebo != null)
 			ebo.upload();
 		vbo.setPointers();
-		glBindVertexArray(0);
+		unbind();
 	}
 
 	public void render() {
 		shader.use();
-		glBindVertexArray(id);
+		bind();
 		if (ebo == null)
 			glDrawArrays(GL_TRIANGLES, 0, vbo.getVertexes());
 		else
 			glDrawElements(GL_TRIANGLES, ebo.getTriangles() * 3, GL_UNSIGNED_INT, 0);
+		unbind();
 	}
 }

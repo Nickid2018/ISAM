@@ -31,12 +31,14 @@ public class Texture {
 		this.image = image;
 		this.level = level;
 		TextureUtil.prepareImage(id, image.getWidth(), image.getHeight());
-		if (level > 0)
-			glGenerateMipmap(level);
 	}
 
 	public void bind() {
 		glBindTexture(GL_TEXTURE_2D, id);
+	}
+
+	public void unbind() {
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
 	public void activeAndBind(int unit) {
@@ -80,7 +82,9 @@ public class Texture {
 
 	public Texture update(int x, int y, int sizeX, int sizeY) {
 		bind();
-		image.upload(level, x, y, 0, 0, sizeX, sizeY, linear, clamp, level > 0);
+		image.upload(0, x, y, 0, 0, sizeX, sizeY, linear, clamp, level > 0);
+		if (level > 0)
+			glGenerateMipmap(level);
 		return this;
 	}
 }

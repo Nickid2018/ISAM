@@ -17,6 +17,7 @@
 package com.github.isam.render.vertex;
 
 import java.nio.*;
+import com.google.common.base.*;
 
 import static org.lwjgl.opengl.GL30.*;
 
@@ -28,17 +29,13 @@ public class VertexBuffer {
 	private int nowVertexes = 0;
 
 	public VertexBuffer(int vertextes) {
-		this(8, vertextes);
+		this(vertextes, GL_STATIC_DRAW);
 	}
 
-	public VertexBuffer(int size, int vertexes) {
-		this(size, vertexes, GL_STATIC_DRAW);
-	}
-
-	public VertexBuffer(int size, int vertexes, int mode) {
+	public VertexBuffer(int vertexes, int mode) {
 		this.mode = mode;
 		id = glGenBuffers();
-		vertices = ByteBuffer.allocateDirect(size * vertexes * 4).order(ByteOrder.nativeOrder()).asFloatBuffer();
+		vertices = ByteBuffer.allocateDirect(8 * vertexes * 4).order(ByteOrder.nativeOrder()).asFloatBuffer();
 	}
 
 	private void ensureSize(int add) {
@@ -80,6 +77,27 @@ public class VertexBuffer {
 		return nowVertexes;
 	}
 
+	public VertexBuffer updateVertexPos(int vertex, float x, float y, float z) {
+		Preconditions.checkArgument(vertex < nowVertexes);
+		glBindBuffer(GL_ARRAY_BUFFER, id);
+		glBufferSubData(GL_ARRAY_BUFFER, vertex * 8 * 4, new float[] { x, y, z });
+		return this;
+	}
+
+	public VertexBuffer updateVertexColor(int vertex, float r, float g, float b) {
+		Preconditions.checkArgument(vertex < nowVertexes);
+		glBindBuffer(GL_ARRAY_BUFFER, id);
+		glBufferSubData(GL_ARRAY_BUFFER, vertex * 8 * 4 + 4 * 3, new float[] { r, g, b });
+		return this;
+	}
+
+	public VertexBuffer updateVertexUV(int vertex, float u, float v) {
+		Preconditions.checkArgument(vertex < nowVertexes);
+		glBindBuffer(GL_ARRAY_BUFFER, id);
+		glBufferSubData(GL_ARRAY_BUFFER, vertex * 8 * 4 + 4 * 6, new float[] { u, v });
+		return this;
+	}
+
 	public VertexBuffer upload() {
 		int pos = vertices.position();
 		vertices.position(0);
@@ -88,7 +106,7 @@ public class VertexBuffer {
 		glBufferData(GL_ARRAY_BUFFER, vertices, mode);
 		return this;
 	}
-	
+
 	public VertexBuffer setPointers() {
 		glVertexAttribPointer(0, 3, GL_FLOAT, false, 4 * 8, 0);
 		glEnableVertexAttribArray(0);

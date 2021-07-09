@@ -22,7 +22,7 @@ import java.util.regex.*;
 import javax.annotation.*;
 
 public final class VideoMode {
-	
+
 	private final int width;
 
 	private final int height;
