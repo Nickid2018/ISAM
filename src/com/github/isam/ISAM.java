@@ -17,6 +17,7 @@
 package com.github.isam;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.lwjgl.opengl.GL11;
@@ -31,6 +32,10 @@ import com.github.isam.render.vertex.ElementBuffer;
 import com.github.isam.render.vertex.VertexArray;
 import com.github.isam.render.vertex.VertexBuffer;
 import com.github.isam.render.window.*;
+import com.github.isam.sound.OggAudioStream;
+import com.github.isam.sound.SoundProperties;
+import com.github.isam.sound.SoundSystem;
+import com.github.isam.sound.StaticSound;
 
 public class ISAM {
 
@@ -70,6 +75,9 @@ public class ISAM {
 		});
 
 		Thread.currentThread().setName("Render Thread");
+
+		SoundSystem.init();
+
 		Image texture;
 		try {
 			texture = Image.read(new FileInputStream("D:\\testFiles\\Popipa_12thSG.png"));
@@ -85,6 +93,15 @@ public class ISAM {
 			throw new RuntimeException(e);
 		}
 		Texture tex2 = new Texture(texture2, 4).setLinear(true).update();
+
+		try {
+			StaticSound sound = new StaticSound(new OggAudioStream(
+					new FileInputStream("D:\\testFiles\\Poppin'Party - (Kizuna Music).ogg")));
+			Thread.sleep(3000);
+			sound.playSound(SoundProperties.create().wihPitch(1).wihVolume(0.02f));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		// Test VAO
 		VertexBuffer buffer = new VertexBuffer(4, GL30.GL_STREAM_DRAW);
@@ -137,6 +154,7 @@ public class ISAM {
 			window.limitDisplayFPS();
 		}
 		window.close();
+		SoundSystem.stop();
 	}
 
 	public float nowX(float x, float y, long time) {
