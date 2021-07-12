@@ -18,13 +18,9 @@ package com.github.isam.render.texture;
 
 import java.io.*;
 import java.nio.*;
-
-import org.lwjgl.stb.STBImage;
 import org.lwjgl.system.*;
-
-import com.github.isam.render.window.Window;
-
 import java.nio.channels.*;
+import com.github.isam.render.window.*;
 
 import static org.lwjgl.opengl.GL14.*;
 
@@ -113,9 +109,5 @@ public class TextureUtil {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	}
-
-	static {
-		STBImage.stbi_set_flip_vertically_on_load(true);
 	}
 }

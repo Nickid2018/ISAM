@@ -16,6 +16,8 @@
  */
 package com.github.isam.render.texture;
 
+import org.lwjgl.stb.*;
+
 import static org.lwjgl.opengl.GL30.*;
 
 public class Texture {
@@ -86,5 +88,9 @@ public class Texture {
 		if (level > 0)
 			glGenerateMipmap(level);
 		return this;
+	}
+	
+	static {
+		STBImage.stbi_set_flip_vertically_on_load(true);
 	}
 }

@@ -17,7 +17,6 @@
 package com.github.isam;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.lwjgl.opengl.GL11;
@@ -74,6 +73,9 @@ public class ISAM {
 			}
 		});
 
+		window.setIcon(ISAM.class.getResourceAsStream("/assets/textures/logo/milogo16.png"),
+				ISAM.class.getResourceAsStream("/assets/textures/logo/milogo32.png"));
+
 		Thread.currentThread().setName("Render Thread");
 
 		SoundSystem.init();
@@ -95,8 +97,8 @@ public class ISAM {
 		Texture tex2 = new Texture(texture2, 4).setLinear(true).update();
 
 		try {
-			StaticSound sound = new StaticSound(new OggAudioStream(
-					new FileInputStream("D:\\testFiles\\Poppin'Party - (Kizuna Music).ogg")));
+			StaticSound sound = new StaticSound(
+					new OggAudioStream(new FileInputStream("D:\\testFiles\\Poppin'Party - (Kizuna Music).ogg")));
 			Thread.sleep(3000);
 			sound.playSound(SoundProperties.create().wihPitch(1).wihVolume(0.02f));
 		} catch (Exception e) {

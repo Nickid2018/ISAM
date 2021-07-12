@@ -291,18 +291,16 @@ public class Image implements AutoCloseable {
 		writeToFile(file.toPath());
 	}
 
-	public void copyFromFont(STBTTFontinfo font, int glyph, int outW, int outH, float scaleX, float scaleY,
-			float shiftX, float shiftY, int i3, int i4) {
-		if (i3 < 0 || i3 + outW > getWidth() || i4 < 0 || i4 + outH > getHeight())
+	public void copyFromFont(STBTTFontinfo font, int codepoint, int outW, int outH, float scaleX, float scaleY,
+			float shiftX, float shiftY, int x, int y) {
+		if (x < 0 || x + outW > getWidth() || y < 0 || y + outH > getHeight())
 			throw new IllegalArgumentException(
-					String.format("Out of bounds: start: (%s, %s) (size: %sx%s); size: %sx%s",
-							new Object[] { Integer.valueOf(i3), Integer.valueOf(i4), Integer.valueOf(outW),
-									Integer.valueOf(outH), Integer.valueOf(getWidth()),
-									Integer.valueOf(getHeight()) }));
+					String.format("Out of bounds: start: (%s, %s) (size: %sx%s); size: %sx%s", x, y, outW, outH,
+							getWidth(), getHeight()));
 		if (format.components() != 1)
 			throw new IllegalArgumentException("Can only write fonts into 1-component images.");
-		STBTruetype.nstbtt_MakeGlyphBitmapSubpixel(font.address(), pixels + i3 + (i4 * getWidth()), outW, outH,
-				getWidth(), scaleX, scaleY, shiftX, shiftY, glyph);
+		STBTruetype.nstbtt_MakeCodepointBitmapSubpixel(font.address(), pixels + x + (y * getWidth()), outW, outH,
+				getWidth(), scaleX, scaleY, shiftX, shiftY, codepoint);
 	}
 
 	public void writeToFile(Path path) throws IOException {

@@ -41,7 +41,8 @@ public class AABB {
 		aabb.minY = minY;
 		aabb.maxX = maxX;
 		aabb.maxY = maxY;
-		Preconditions.checkArgument(checkValid && !aabb.isValid(), "Invalid AABB");
+		if (checkValid)
+			Preconditions.checkArgument(!aabb.isValid(), "Invalid AABB");
 		return aabb.validate();
 	}
 
@@ -118,6 +119,16 @@ public class AABB {
 
 	public boolean contains(double x, double y) {
 		return minX <= x && x <= maxX && minY <= y && y <= maxY;
+	}
+
+	public double getWidth() {
+		validate();
+		return maxX - minX;
+	}
+
+	public double getHeight() {
+		validate();
+		return maxY - minY;
 	}
 
 	public AABB newCopy() {
