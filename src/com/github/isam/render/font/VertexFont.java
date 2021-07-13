@@ -12,13 +12,14 @@ import com.github.isam.render.texture.*;
 public class VertexFont {
 
 	public static void main(String[] args) throws Exception {
-		VertexFont font = new VertexFont(new FileInputStream("C:\\Windows\\Fonts\\msyh.ttf"), 24);
+		VertexFont font = new VertexFont(new FileInputStream("C:\\Windows\\Fonts\\MSYH.TTF"), 72);
 		System.out.println("Font loaded!");
 		FontVertexInfos info = font.getCodepointInfo(0);
 		for (int i = 0; i < 256; i++) {
 			try {
 				font.getCodepointInfo(i);
 			} catch (Exception e) {
+				System.out.println(Integer.toHexString(i));
 			}
 		}
 		info.atlas.getImage().writeToFile("D:\\a.png");

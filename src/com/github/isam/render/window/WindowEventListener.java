@@ -18,7 +18,7 @@ package com.github.isam.render.window;
 
 public interface WindowEventListener {
 
-	public void onResizeDisplay();
+	public void onResizeDisplay(int sWidth, int sHeight, int reWidth, int reHeight);
 
 	public void onFocus(boolean focus);
 }

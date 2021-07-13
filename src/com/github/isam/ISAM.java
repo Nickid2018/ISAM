@@ -63,7 +63,7 @@ public class ISAM {
 		window = new Window("ISAM", data, new WindowEventListener() {
 
 			@Override
-			public void onResizeDisplay() {
+			public void onResizeDisplay(int sWidth, int sHeight, int reWidth, int reHeight) {
 				System.out.println("resize!");
 			}
 
@@ -71,7 +71,7 @@ public class ISAM {
 			public void onFocus(boolean focus) {
 				System.out.println("focus update! " + focus);
 			}
-		});
+		}, null, null);
 
 		window.setIcon(ISAM.class.getResourceAsStream("/assets/textures/logo/milogo16.png"),
 				ISAM.class.getResourceAsStream("/assets/textures/logo/milogo32.png"));
@@ -182,7 +182,7 @@ public class ISAM {
 	public static void initializeThrowableListener() {
 		Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
 			CrashReport report = new CrashReport("Final throwable tracker", e);
-			report.writeToFile("plain");
+			report.writeToFile();
 			System.exit(-1);
 		});
 	}

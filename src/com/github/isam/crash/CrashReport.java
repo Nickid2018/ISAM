@@ -30,11 +30,6 @@ import com.google.common.collect.*;
 
 public class CrashReport {
 
-	public static void main(String[] args) {
-		System.out.println(new CrashReport("..", new Error(".....")).populateReport());
-		new CrashReport("..", new Error(".....")).writeToFile("client");
-	}
-
 	private List<CrashReportSession> sessions = Lists.newArrayList();
 	private String detail;
 	private Throwable throwable;
@@ -48,7 +43,7 @@ public class CrashReport {
 		fillSystemDetails();
 		StringWriter s = new StringWriter();
 		PrintWriter writer = new PrintWriter(s);
-		writer.println(" ----- Chemistry Lab Crash Report");
+		writer.println(" ----- ISAM Crash Report");
 		writer.println(getWittyComment());
 		writer.println("Time: " + (new SimpleDateFormat()).format(new Date()));
 		writer.println("Description: " + detail);
@@ -66,10 +61,10 @@ public class CrashReport {
 		return s.toString();
 	}
 
-	public void writeToFile(String side) {
+	public void writeToFile() {
 		try {
-			File file = new File("crash-report/crash-"
-					+ (new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss")).format(new Date()) + "-" + side + ".txt");
+			File file = new File(
+					"crash-report/crash-" + (new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss")).format(new Date()) + ".txt");
 			File dir = file.getParentFile();
 			if (!dir.isDirectory())
 				dir.mkdirs();
@@ -223,15 +218,7 @@ public class CrashReport {
 		return runtimeMXBean.getInputArguments().stream().filter(string -> !string.startsWith("-X"));
 	}
 
-	public static final List<String> WITTY_COMMENT = Arrays.asList("To be or not to be, this is up to Archibald Lee",
-			"O, I am slain!", "===FBI WARNING===", "This bug must be created by mmc1234!", "A-W-S-L",
-			"Why the sp3 minus the sp gets the sp2?", "I have a bad feeling about this.",
-			"Make the copper multiplied by alumium and then divided by chlorine, and you can get the gold.",
-			"The polar bear can't dissolve in benzene, for it is polar.",
-			"Don't let the Fluoride Hydroxide into the lightbulb, or the liquid will make it broken.",
-			"As we know, Mercaptan and Mermaid have the same origin.",
-			"P2O5 is an excellent chemical, for it can turn the mercury into the silver.",
-			"Shout at the Hg-198:\"The new gay! Hand out your proton!\", and you can gain much gold.");
+	public static final List<String> WITTY_COMMENT = Arrays.asList("That can run well on my computer!", "Oh no");
 
 	public static String getWittyComment() {
 		return "// " + WITTY_COMMENT.get(Constants.RANDOM.nextInt(WITTY_COMMENT.size()));
