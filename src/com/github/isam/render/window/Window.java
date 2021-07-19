@@ -39,7 +39,7 @@ public class Window implements AutoCloseable {
 	private long handle;
 	@Nullable
 	private Monitor monitor;
-	private WindowEventListener handler;
+	private WindowEventListener window;
 	private KeyboardInputListener keyboard;
 	private MouseInputListener mouse;
 
@@ -47,8 +47,6 @@ public class Window implements AutoCloseable {
 	private int height;
 	private int windowWidth;
 	private int windowHeight;
-	private int framebufferWidth;
-	private int framebufferHeight;
 	private int posX;
 	private int posY;
 	private int x;
@@ -62,9 +60,8 @@ public class Window implements AutoCloseable {
 
 	private double lastDrawTime;
 
-	public Window(String title, DisplayData data, WindowEventListener handler, KeyboardInputListener keyboard,
-			MouseInputListener mouse) {
-		this.handler = handler;
+	public Window(String title, DisplayData data, WindowEventListener window) {
+		this.window = window;
 		frameLimit = data.frameLimit;
 		setBootGlErrorCallback();
 		GLFW.glfwInit();
@@ -89,19 +86,9 @@ public class Window implements AutoCloseable {
 		GLFW.glfwMakeContextCurrent(handle);
 		GL.createCapabilities();
 		setMode();
-		this.setKeyboard(keyboard);
-		this.setMouse(mouse);
 		GLFW.glfwSetWindowPosCallback(handle, this::onMove);
 		GLFW.glfwSetWindowSizeCallback(handle, this::onResize);
 		GLFW.glfwSetWindowFocusCallback(handle, this::onFocus);
-		GLFW.glfwSetFramebufferSizeCallback(handle, this::onFramebufferResize);
-		GLFW.glfwSetKeyCallback(handle, keyboard::onKeyInput);
-		GLFW.glfwSetCharCallback(handle, keyboard::onCharInput);
-		GLFW.glfwSetCharModsCallback(handle, keyboard::onCharModInput);
-		GLFW.glfwSetMouseButtonCallback(handle, mouse::onMouse);
-		GLFW.glfwSetCursorPosCallback(handle, mouse::onMove);
-		GLFW.glfwSetScrollCallback(handle, mouse::onScroll);
-		GLFW.glfwSetDropCallback(handle, mouse::onDrop);
 		GLFW.glfwSetErrorCallback(ERR_CALLBACK).free();
 	}
 
@@ -114,13 +101,13 @@ public class Window implements AutoCloseable {
 	}
 
 	public int getWidth() {
-		return framebufferWidth;
+		return width;
 	}
 
 	public int getHeight() {
-		return framebufferHeight;
+		return height;
 	}
-	
+
 	public long getHandle() {
 		return handle;
 	}
@@ -135,27 +122,17 @@ public class Window implements AutoCloseable {
 	}
 
 	public void onResize(long handle, int reWidth, int reHeight) {
+		int sWidth = width;
+		int sHeight = height;
 		width = reWidth;
 		height = reHeight;
 		GL11.glViewport(0, 0, width, height);
+		window.onResizeDisplay(sWidth, sHeight, reWidth, reHeight);
 	}
 
 	public void onFocus(long handle, boolean focus) {
 		if (handle == this.handle)
-			handler.onFocus(focus);
-	}
-
-	public void onFramebufferResize(long handle, int reWidth, int reHeight) {
-		if (handle != this.handle)
-			return;
-		int sWidth = framebufferWidth;
-		int sHeight = framebufferHeight;
-		if (reWidth == 0 || reHeight == 0)
-			return;
-		framebufferWidth = reWidth;
-		framebufferHeight = reHeight;
-		if (framebufferWidth != sWidth || framebufferHeight != sHeight)
-			handler.onResizeDisplay(sWidth, sHeight, reWidth, reHeight);
+			window.onFocus(focus);
 	}
 
 	public KeyboardInputListener getKeyboard() {
@@ -164,9 +141,9 @@ public class Window implements AutoCloseable {
 
 	public void setKeyboard(KeyboardInputListener keyboard) {
 		this.keyboard = keyboard;
-		GLFW.glfwSetKeyCallback(handle, keyboard::onKeyInput).free();
-		GLFW.glfwSetCharCallback(handle, keyboard::onCharInput).free();
-		GLFW.glfwSetCharModsCallback(handle, keyboard::onCharModInput).free();
+		GLFW.glfwSetKeyCallback(handle, keyboard::onKeyInput);
+		GLFW.glfwSetCharCallback(handle, keyboard::onCharInput);
+		GLFW.glfwSetCharModsCallback(handle, keyboard::onCharModInput);
 	}
 
 	public MouseInputListener getMouse() {
@@ -175,10 +152,10 @@ public class Window implements AutoCloseable {
 
 	public void setMouse(MouseInputListener mouse) {
 		this.mouse = mouse;
-		GLFW.glfwSetMouseButtonCallback(handle, mouse::onMouse).free();
-		GLFW.glfwSetCursorPosCallback(handle, mouse::onMove).free();
-		GLFW.glfwSetScrollCallback(handle, mouse::onScroll).free();
-		GLFW.glfwSetDropCallback(handle, mouse::onDrop).free();
+		GLFW.glfwSetMouseButtonCallback(handle, mouse::onMouse);
+		GLFW.glfwSetCursorPosCallback(handle, mouse::onMove);
+		GLFW.glfwSetScrollCallback(handle, mouse::onScroll);
+		GLFW.glfwSetDropCallback(handle, mouse::onDrop);
 	}
 
 	public void updateVsync(boolean bool) {
@@ -200,7 +177,7 @@ public class Window implements AutoCloseable {
 			int sWidth = width;
 			int sHeight = height;
 			setMode();
-			handler.onResizeDisplay(sWidth, sHeight, width, height);
+			window.onResizeDisplay(sWidth, sHeight, width, height);
 			updateVsync(vsync);
 		} catch (Exception exception) {
 			LOGGER.error("Couldn't toggle fullscreen", exception);
@@ -224,7 +201,7 @@ public class Window implements AutoCloseable {
 	}
 
 	public void clear() {
-		GL11.glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		GL11.glClearColor(0.6f, 0.6f, 0.6f, 1.0f);
 		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
 	}
 

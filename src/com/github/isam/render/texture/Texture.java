@@ -84,7 +84,7 @@ public class Texture {
 
 	public Texture update(int x, int y, int sizeX, int sizeY) {
 		bind();
-		image.upload(0, x, y, 0, 0, sizeX, sizeY, linear, clamp, level > 0);
+		image.upload(0, x, y, x, y, sizeX, sizeY, linear, clamp, level > 0);
 		if (level > 0)
 			glGenerateMipmap(level);
 		return this;

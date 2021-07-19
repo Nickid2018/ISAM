@@ -18,6 +18,7 @@ package com.github.isam.render.vertex;
 
 import java.nio.*;
 
+import static org.lwjgl.opengl.GL15.glDeleteBuffers;
 import static org.lwjgl.opengl.GL30.*;
 
 public class ElementBuffer {
@@ -72,5 +73,9 @@ public class ElementBuffer {
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices, mode);
 		return this;
+	}
+	
+	public void destroy() {
+		glDeleteBuffers(id);
 	}
 }

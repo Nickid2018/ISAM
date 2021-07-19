@@ -16,9 +16,17 @@
  */
 package com.github.isam.render;
 
+import com.github.isam.render.window.*;
+
 public interface Renderer {
 
-	public void drawTexture(String resourceName, float x, float y);
+	public Window getWindow();
 
-	public void drawText(CharSequence str, float x, float y);
+	public float getXPosition(int px);
+
+	public float getYPosition(int px);
+
+	public float getHorizonLength(int px);
+
+	public float getVerticalLength(int px);
 }

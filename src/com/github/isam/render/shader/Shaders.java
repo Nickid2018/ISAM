@@ -21,14 +21,22 @@ import java.io.*;
 public class Shaders {
 
 	public static final ShaderProgram SIMPLE;
+	public static final ShaderProgram FONT;
 
 	static {
 		try {
 			SIMPLE = ShaderProgram.createFromJAR("/assets/shader/simple.vsh", "/assets/shader/simple.fsh",
 					new Uniform("sampler", Uniform.Type.INT_1));
 		} catch (IOException e) {
-			throw new RuntimeException("Can't create shader", e);
+			throw new RuntimeException("Can't create shader 'simple'", e);
 		}
 		SIMPLE.getUniform("sampler").setInt(0);
+		try {
+			FONT = ShaderProgram.createFromJAR("/assets/shader/simple.vsh", "/assets/shader/font.fsh",
+					new Uniform("sampler", Uniform.Type.INT_1));
+		} catch (IOException e) {
+			throw new RuntimeException("Can't create shader 'font'", e);
+		}
+		FONT.getUniform("sampler").setInt(0);
 	}
 }

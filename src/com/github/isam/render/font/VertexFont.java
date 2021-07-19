@@ -14,15 +14,7 @@ public class VertexFont {
 	public static void main(String[] args) throws Exception {
 		VertexFont font = new VertexFont(new FileInputStream("C:\\Windows\\Fonts\\MSYH.TTF"), 72);
 		System.out.println("Font loaded!");
-		FontVertexInfos info = font.getCodepointInfo(0);
-		for (int i = 0; i < 256; i++) {
-			try {
-				font.getCodepointInfo(i);
-			} catch (Exception e) {
-				System.out.println(Integer.toHexString(i));
-			}
-		}
-		info.atlas.getImage().writeToFile("D:\\a.png");
+		System.out.println(font.getSpaceLength());
 	}
 
 	private STBTTFontinfo font;
@@ -32,9 +24,12 @@ public class VertexFont {
 	private float ascent;
 	private float descent;
 	private float lineGap;
+	private float spaceLength;
 	private float scale;
+	private final int size;
 
 	public VertexFont(InputStream fontFile, int size) throws IOException {
+		this.size = size;
 		font = STBTTFontinfo.create();
 		buffer = TextureUtil.readResource(fontFile);
 		buffer.rewind();
@@ -49,7 +44,15 @@ public class VertexFont {
 			ascent = ascentBuf.get(0) * scale;
 			descent = descentBuf.get(0) * scale;
 			lineGap = lineGapBuf.get(0) * scale;
+			IntBuffer advanceWidthBuf = stack.mallocInt(1);
+			IntBuffer leftSideBearingBuf = stack.mallocInt(1);
+			STBTruetype.stbtt_GetCodepointHMetrics(font, ' ', advanceWidthBuf, leftSideBearingBuf);
+			spaceLength = advanceWidthBuf.get(0) * scale;
 		}
+	}
+
+	public int getSize() {
+		return size;
 	}
 
 	public float getAscent() {
@@ -62,6 +65,10 @@ public class VertexFont {
 
 	public float getLineGap() {
 		return lineGap;
+	}
+
+	public float getSpaceLength() {
+		return spaceLength;
 	}
 
 	public FontVertexInfos getCodepointInfo(int codepoint) {
@@ -91,15 +98,15 @@ public class VertexFont {
 				throw new IllegalArgumentException("Can't generate the font bitmap - unrecorded character");
 			for (FontAtlas atlas : atlases) {
 				Optional<FontVertexInfos> optional = atlas.putBitmap(font, codepoint, scale, width, height, left, top,
-						convertL, convertA, ascent - buttom);
+						convertL, convertA, ascent + buttom);
 				if (optional.isPresent()) {
 					chars.put(codepoint, atlas);
 					return optional.get();
 				}
 			}
-			FontAtlas atlas = new FontAtlas();
+			FontAtlas atlas = new FontAtlas(this);
 			Optional<FontVertexInfos> optional = atlas.putBitmap(font, codepoint, scale, width, height, left, top,
-					convertL, convertA, ascent - buttom);
+					convertL, convertA, ascent + buttom);
 			if (optional.isPresent()) {
 				atlases.add(atlas);
 				chars.put(codepoint, atlas);

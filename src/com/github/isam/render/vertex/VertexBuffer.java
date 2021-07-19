@@ -116,4 +116,8 @@ public class VertexBuffer {
 		glEnableVertexAttribArray(2);
 		return this;
 	}
+	
+	public void destroy() {
+		glDeleteBuffers(id);
+	}
 }

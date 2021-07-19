@@ -2,6 +2,7 @@ package com.github.isam.render.font;
 
 import java.util.*;
 import org.lwjgl.stb.*;
+import java.util.concurrent.*;
 import com.github.isam.phys.*;
 import it.unimi.dsi.fastutil.ints.*;
 import com.github.isam.render.texture.*;
@@ -11,10 +12,14 @@ public class FontAtlas {
 	private Image image;
 	private Int2ObjectMap<FontVertexInfos> chars = new Int2ObjectAVLTreeMap<>();
 	private List<AABB> spareSpace = new ArrayList<>();
+	private Queue<FontVertexInfos> toUpdates = new ConcurrentLinkedQueue<>();
+	private Texture texture;
+	private VertexFont font;
 
-	public FontAtlas() {
+	public FontAtlas(VertexFont font) {
 		image = new Image(Image.Format.LUMINANCE, 1024, 1024, false);
 		spareSpace.add(AABB.newAABB(0, 0, 1024, 1024));
+		this.font = font;
 	}
 
 	public Optional<FontVertexInfos> putBitmap(STBTTFontinfo font, int codepoint, float scale, int width, int height,
@@ -43,6 +48,7 @@ public class FontAtlas {
 		// Add to image
 		image.copyFromFont(font, codepoint, width, height, scale, scale, 0, 0, (int) minChunk.minX,
 				(int) minChunk.minY);
+		toUpdates.offer(info);
 		// Split
 		spareSpace.remove(minChunk);
 		double widthLen = minChunk.getWidth() - width;
@@ -94,5 +100,23 @@ public class FontAtlas {
 
 	public FontVertexInfos getChar(int codepoint) {
 		return chars.get(codepoint);
+	}
+
+	public void refresh() {
+		if (texture == null)
+			texture = new Texture(image, 0).setLinear(font.getSize() <= 32).setClamp(true);
+		while (!toUpdates.isEmpty()) {
+			FontVertexInfos info = toUpdates.poll();
+			int x = (int) (info.minU * 1024);
+			int y = (int) (info.minV * 1024);
+			int xSize = (int) ((info.maxU - info.minU) * 1024);
+			int ySize = (int) ((info.maxV - info.minV) * 1024);
+			texture.update(x, y, xSize, ySize);
+		}
+	}
+
+	public Texture getTexture() {
+		refresh();
+		return texture;
 	}
 }

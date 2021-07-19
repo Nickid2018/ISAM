@@ -42,6 +42,14 @@ public class VertexArray {
 		return this;
 	}
 
+	public VertexBuffer getVBO() {
+		return vbo;
+	}
+
+	public ElementBuffer getEBO() {
+		return ebo;
+	}
+
 	public void bind() {
 		glBindVertexArray(id);
 	}
@@ -67,5 +75,12 @@ public class VertexArray {
 		else
 			glDrawElements(GL_TRIANGLES, ebo.getTriangles() * 3, GL_UNSIGNED_INT, 0);
 		unbind();
+	}
+
+	public void destroy() {
+		glDeleteVertexArrays(id);
+		if (ebo != null)
+			ebo.destroy();
+		vbo.destroy();
 	}
 }
