@@ -1,7 +1,7 @@
 /*
  * Copyright 2021 ISAM
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ *  Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
  *
@@ -12,28 +12,27 @@
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
  * License for the specific language governing permissions and limitations under
  * the License.
- * 
  */
 package com.github.isam.util;
 
-import java.util.function.*;
+import java.util.function.Supplier;
 
 public class LazyLoadedValue<T> {
 
-	private Supplier<T> factory;
+    private Supplier<T> factory;
 
-	private T value;
+    private T value;
 
-	public LazyLoadedValue(Supplier<T> supplier) {
-		factory = supplier;
-	}
+    public LazyLoadedValue(Supplier<T> supplier) {
+        factory = supplier;
+    }
 
-	public T get() {
-		Supplier<T> supplier = factory;
-		if (supplier != null) {
-			value = supplier.get();
-			factory = null;
-		}
-		return value;
-	}
+    public T get() {
+        Supplier<T> supplier = factory;
+        if (supplier != null) {
+            value = supplier.get();
+            factory = null;
+        }
+        return value;
+    }
 }

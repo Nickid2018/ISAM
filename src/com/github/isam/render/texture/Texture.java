@@ -1,7 +1,7 @@
 /*
  * Copyright 2021 ISAM
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ *  Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
  *
@@ -12,85 +12,32 @@
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
  * License for the specific language governing permissions and limitations under
  * the License.
- * 
  */
+
 package com.github.isam.render.texture;
 
-import org.lwjgl.stb.*;
+import org.lwjgl.opengl.GL30;
 
-import static org.lwjgl.opengl.GL30.*;
+public interface Texture {
 
-public class Texture {
+    void bind();
 
-	private int id;
-	private Image image;
-	private int level;
-	private boolean linear;
-	private boolean clamp;
+    void unbind();
 
-	public Texture(Image image, int level) {
-		id = TextureUtil.generateTextureId();
-		this.image = image;
-		this.level = level;
-		TextureUtil.prepareImage(id, image.getWidth(), image.getHeight());
-	}
+    default void activeAndBind(int unit) {
+        GL30.glActiveTexture(GL30.GL_TEXTURE0 + unit);
+        bind();
+    }
 
-	public void bind() {
-		glBindTexture(GL_TEXTURE_2D, id);
-	}
+    boolean isLinear();
 
-	public void unbind() {
-		glBindTexture(GL_TEXTURE_2D, 0);
-	}
+    Texture setLinear(boolean linear);
 
-	public void activeAndBind(int unit) {
-		glActiveTexture(GL_TEXTURE0 + unit);
-		bind();
-	}
+    boolean isClamp();
 
-	public int getLevel() {
-		return level;
-	}
+    Texture setClamp(boolean clamp);
 
-	public boolean isLinear() {
-		return linear;
-	}
+    Texture update();
 
-	public Texture setLinear(boolean linear) {
-		this.linear = linear;
-		return this;
-	}
-
-	public boolean isClamp() {
-		return clamp;
-	}
-
-	public Texture setClamp(boolean clamp) {
-		this.clamp = clamp;
-		return this;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public Image getImage() {
-		return image;
-	}
-
-	public Texture update() {
-		return update(0, 0, image.getWidth(), image.getHeight());
-	}
-
-	public Texture update(int x, int y, int sizeX, int sizeY) {
-		bind();
-		image.upload(0, x, y, x, y, sizeX, sizeY, linear, clamp, level > 0);
-		if (level > 0)
-			glGenerateMipmap(level);
-		return this;
-	}
-	
-	static {
-		STBImage.stbi_set_flip_vertically_on_load(true);
-	}
+    Texture update(int x, int y, int sizeX, int sizeY);
 }

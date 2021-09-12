@@ -1,7 +1,7 @@
 /*
  * Copyright 2021 ISAM
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ *  Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
  *
@@ -12,122 +12,118 @@
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
  * License for the specific language governing permissions and limitations under
  * the License.
- * 
  */
 package com.github.isam.render.window;
 
-import java.util.*;
-import org.lwjgl.glfw.*;
-import java.util.regex.*;
-import javax.annotation.*;
+import org.lwjgl.glfw.GLFWVidMode;
+
+import javax.annotation.Nullable;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public final class VideoMode {
 
-	private final int width;
+    private static final Pattern PATTERN = Pattern.compile("(\\d+)x(\\d+)(?:@(\\d+)(?::(\\d+))?)?");
+    private final int width;
+    private final int height;
+    private final int redBits;
+    private final int greenBits;
+    private final int blueBits;
+    private final int refreshRate;
 
-	private final int height;
+    public VideoMode(int width, int height, int redBits, int greenBits, int blueBits, int refreshRate) {
+        this.width = width;
+        this.height = height;
+        this.redBits = redBits;
+        this.greenBits = greenBits;
+        this.blueBits = blueBits;
+        this.refreshRate = refreshRate;
+    }
 
-	private final int redBits;
+    public VideoMode(GLFWVidMode.Buffer buffer) {
+        width = buffer.width();
+        height = buffer.height();
+        redBits = buffer.redBits();
+        greenBits = buffer.greenBits();
+        blueBits = buffer.blueBits();
+        refreshRate = buffer.refreshRate();
+    }
 
-	private final int greenBits;
+    public VideoMode(GLFWVidMode gLfWvidMode) {
+        width = gLfWvidMode.width();
+        height = gLfWvidMode.height();
+        redBits = gLfWvidMode.redBits();
+        greenBits = gLfWvidMode.greenBits();
+        blueBits = gLfWvidMode.blueBits();
+        refreshRate = gLfWvidMode.refreshRate();
+    }
 
-	private final int blueBits;
+    public static Optional<VideoMode> read(@Nullable String string) {
+        if (string == null)
+            return Optional.empty();
+        try {
+            Matcher matcher = PATTERN.matcher(string);
+            if (matcher.matches()) {
+                int width = Integer.parseInt(matcher.group(1));
+                int height = Integer.parseInt(matcher.group(2));
+                String refrashRateStr = matcher.group(3);
+                int refrashRate = refrashRateStr == null ? 60 : Integer.parseInt(refrashRateStr);
+                String colorBitStr = matcher.group(4);
+                int colorBits = colorBitStr == null ? 24 : Integer.parseInt(colorBitStr);
+                int colorBit = colorBits / 3;
+                return Optional.of(new VideoMode(width, height, colorBit, colorBit, colorBit, refrashRate));
+            }
+        } catch (Exception ignored) {
+        }
+        return Optional.empty();
+    }
 
-	private final int refreshRate;
+    public int getWidth() {
+        return width;
+    }
 
-	private static final Pattern PATTERN = Pattern.compile("(\\d+)x(\\d+)(?:@(\\d+)(?::(\\d+))?)?");
+    public int getHeight() {
+        return height;
+    }
 
-	public VideoMode(int width, int height, int redBits, int greenBits, int blueBits, int refreshRate) {
-		this.width = width;
-		this.height = height;
-		this.redBits = redBits;
-		this.greenBits = greenBits;
-		this.blueBits = blueBits;
-		this.refreshRate = refreshRate;
-	}
+    public int getRedBits() {
+        return redBits;
+    }
 
-	public VideoMode(GLFWVidMode.Buffer buffer) {
-		width = buffer.width();
-		height = buffer.height();
-		redBits = buffer.redBits();
-		greenBits = buffer.greenBits();
-		blueBits = buffer.blueBits();
-		refreshRate = buffer.refreshRate();
-	}
+    public int getGreenBits() {
+        return greenBits;
+    }
 
-	public VideoMode(GLFWVidMode gLfWvidMode) {
-		width = gLfWvidMode.width();
-		height = gLfWvidMode.height();
-		redBits = gLfWvidMode.redBits();
-		greenBits = gLfWvidMode.greenBits();
-		blueBits = gLfWvidMode.blueBits();
-		refreshRate = gLfWvidMode.refreshRate();
-	}
+    public int getBlueBits() {
+        return blueBits;
+    }
 
-	public int getWidth() {
-		return width;
-	}
+    public int getRefreshRate() {
+        return refreshRate;
+    }
 
-	public int getHeight() {
-		return height;
-	}
+    public boolean equals(Object object) {
+        if (this == object)
+            return true;
+        if (object == null || getClass() != object.getClass())
+            return false;
+        VideoMode videoMode = (VideoMode) object;
+        return width == videoMode.width && height == videoMode.height && redBits == videoMode.redBits
+                && greenBits == videoMode.greenBits && blueBits == videoMode.blueBits
+                && refreshRate == videoMode.refreshRate;
+    }
 
-	public int getRedBits() {
-		return redBits;
-	}
+    public int hashCode() {
+        return Objects.hash(width, height, redBits, greenBits, blueBits, refreshRate);
+    }
 
-	public int getGreenBits() {
-		return greenBits;
-	}
+    public String toString() {
+        return String.format("%sx%s@%s (%sbit)", width, height, refreshRate, redBits + greenBits + blueBits);
+    }
 
-	public int getBlueBits() {
-		return blueBits;
-	}
-
-	public int getRefreshRate() {
-		return refreshRate;
-	}
-
-	public boolean equals(Object object) {
-		if (this == object)
-			return true;
-		if (object == null || getClass() != object.getClass())
-			return false;
-		VideoMode videoMode = (VideoMode) object;
-		return width == videoMode.width && height == videoMode.height && redBits == videoMode.redBits
-				&& greenBits == videoMode.greenBits && blueBits == videoMode.blueBits
-				&& refreshRate == videoMode.refreshRate;
-	}
-
-	public int hashCode() {
-		return Objects.hash(width, height, redBits, greenBits, blueBits, refreshRate);
-	}
-
-	public String toString() {
-		return String.format("%sx%s@%s (%sbit)", width, height, refreshRate, redBits + greenBits + blueBits);
-	}
-
-	public static Optional<VideoMode> read(@Nullable String string) {
-		if (string == null)
-			return Optional.empty();
-		try {
-			Matcher matcher = PATTERN.matcher(string);
-			if (matcher.matches()) {
-				int width = Integer.parseInt(matcher.group(1));
-				int height = Integer.parseInt(matcher.group(2));
-				String refrashRateStr = matcher.group(3);
-				int refrashRate = refrashRateStr == null ? 60 : Integer.parseInt(refrashRateStr);
-				String colorBitStr = matcher.group(4);
-				int colorBits = colorBitStr == null ? 24 : Integer.parseInt(colorBitStr);
-				int colorBit = colorBits / 3;
-				return Optional.of(new VideoMode(width, height, colorBit, colorBit, colorBit, refrashRate));
-			}
-		} catch (Exception exception) {
-		}
-		return Optional.empty();
-	}
-
-	public String write() {
-		return String.format("%sx%s@%s:%s", width, height, refreshRate, redBits + greenBits + blueBits);
-	}
+    public String write() {
+        return String.format("%sx%s@%s:%s", width, height, refreshRate, redBits + greenBits + blueBits);
+    }
 }
