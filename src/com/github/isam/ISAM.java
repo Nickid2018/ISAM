@@ -35,6 +35,7 @@ import com.github.isam.sound.StaticSound;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Random;
 
 public class ISAM {
 
@@ -117,7 +118,7 @@ public class ISAM {
         SimpleRenderer renderer = new SimpleRenderer(window);
         VertexFont font = null;
         try {
-            font = new VertexFont(new FileInputStream("C:\\Windows\\Fonts\\segoesc.ttf"), 64);
+            font = new VertexFont(new FileInputStream("C:\\Windows\\Fonts\\STKAITI.TTF"), 64);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -168,6 +169,11 @@ public class ISAM {
 
             window.updateDisplay(false);
             window.limitDisplayFPS();
+        }
+        try {
+            font.getCodepointInfo('W').atlas.getImage().writeToFile("D:\\test.png");
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         window.close();
         SoundSystem.stop();

@@ -24,6 +24,7 @@ import org.lwjgl.stb.STBTTFontinfo;
 import org.lwjgl.stb.STBTruetype;
 import org.lwjgl.system.MemoryStack;
 
+import javax.annotation.Nonnull;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -66,12 +67,6 @@ public class VertexFont {
         }
     }
 
-    public static void main(String[] args) throws Exception {
-        VertexFont font = new VertexFont(new FileInputStream("C:\\Windows\\Fonts\\MSYH.TTF"), 72);
-        System.out.println("Font loaded!");
-        System.out.println(font.getSpaceLength());
-    }
-
     public int getSize() {
         return size;
     }
@@ -92,25 +87,26 @@ public class VertexFont {
         return spaceLength;
     }
 
+    @Nonnull
     public FontVertexInfos getCodepointInfo(int codepoint) {
         if (chars.containsKey(codepoint))
             return chars.get(codepoint).getChar(codepoint);
         try (MemoryStack stack = MemoryStack.stackPush()) {
             IntBuffer leftBuf = stack.mallocInt(1);
-            IntBuffer buttomBuf = stack.mallocInt(1);
+            IntBuffer bottomBuf = stack.mallocInt(1);
             IntBuffer rightBuf = stack.mallocInt(1);
             IntBuffer topBuf = stack.mallocInt(1);
-            STBTruetype.stbtt_GetCodepointBitmapBox(font, codepoint, scale, scale, leftBuf, buttomBuf, rightBuf,
+            STBTruetype.stbtt_GetCodepointBitmapBox(font, codepoint, scale, scale, leftBuf, bottomBuf, rightBuf,
                     topBuf);
             IntBuffer advanceWidthBuf = stack.mallocInt(1);
             IntBuffer leftSideBearingBuf = stack.mallocInt(1);
             STBTruetype.stbtt_GetCodepointHMetrics(font, codepoint, advanceWidthBuf, leftSideBearingBuf);
             int left = leftBuf.get(0);
-            int buttom = buttomBuf.get(0);
+            int bottom = bottomBuf.get(0);
             int right = rightBuf.get(0);
             int top = topBuf.get(0);
             int width = right - left;
-            int height = top - buttom;
+            int height = top - bottom;
             int advanceWidth = advanceWidthBuf.get(0);
             int leftSideBearing = leftSideBearingBuf.get(0);
             float convertL = leftSideBearing * scale;
@@ -119,7 +115,7 @@ public class VertexFont {
                 throw new IllegalArgumentException("Can't generate the font bitmap - unrecorded character");
             for (FontAtlas atlas : atlases) {
                 Optional<FontVertexInfos> optional = atlas.putBitmap(font, codepoint, scale, width, height, left, top,
-                        convertL, convertA, ascent + buttom);
+                        convertL, convertA, ascent + bottom);
                 if (optional.isPresent()) {
                     chars.put(codepoint, atlas);
                     return optional.get();
@@ -127,7 +123,7 @@ public class VertexFont {
             }
             FontAtlas atlas = new FontAtlas(this);
             Optional<FontVertexInfos> optional = atlas.putBitmap(font, codepoint, scale, width, height, left, top,
-                    convertL, convertA, ascent + buttom);
+                    convertL, convertA, ascent + bottom);
             if (optional.isPresent()) {
                 atlases.add(atlas);
                 chars.put(codepoint, atlas);

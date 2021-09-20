@@ -17,6 +17,8 @@ package com.github.isam.phys;
 
 import com.google.common.base.Preconditions;
 
+import javax.annotation.Nonnull;
+
 /**
  * @author Nickid2018
  */
@@ -138,7 +140,7 @@ public class AABB {
         return aabb;
     }
 
-    public boolean equals(AABB other) {
+    public boolean equals(@Nonnull AABB other) {
         return minX == other.minX && minY == other.minY && maxX == other.maxX && maxY == other.maxY;
     }
 

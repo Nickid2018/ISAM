@@ -74,46 +74,51 @@ public class FontAtlas {
         // Split
         spareSpace.remove(minChunk);
         double widthLen = minChunk.getWidth() - width;
+        double heightLen = minChunk.getHeight() - height;
+        if (widthLen == 0 && heightLen == 0)
+            return Optional.of(info);
         if (widthLen == 0) {
-            spareSpace.add(AABB.newAABB(minChunk.minX, minChunk.minY + height, minChunk.maxX, minChunk.maxY));
-            sortAABBs();
+            insertAABB(AABB.newAABB(minChunk.minX, minChunk.minY + height, minChunk.maxX, minChunk.maxY));
             return Optional.of(info);
         }
-        double heightLen = minChunk.getHeight() - height;
         if (heightLen == 0) {
-            spareSpace.add(AABB.newAABB(minChunk.minX + width, minChunk.minY, minChunk.maxX, minChunk.maxY));
-            sortAABBs();
+            insertAABB(AABB.newAABB(minChunk.minX + width, minChunk.minY, minChunk.maxX, minChunk.maxY));
             return Optional.of(info);
         }
         double area1 = widthLen * height;
         double area2 = heightLen * width;
         if (area1 > area2) {
-            spareSpace.add(AABB.newAABB(minChunk.minX + width, minChunk.minY, minChunk.maxX, minChunk.maxY));
-            spareSpace.add(AABB.newAABB(minChunk.minX, minChunk.minY + height, minChunk.minX + width, minChunk.maxY));
+            insertAABB(AABB.newAABB(minChunk.minX + width, minChunk.minY, minChunk.maxX, minChunk.maxY));
+            insertAABB(AABB.newAABB(minChunk.minX, minChunk.minY + height, minChunk.minX + width, minChunk.maxY));
         } else {
-            spareSpace.add(AABB.newAABB(minChunk.minX, minChunk.minY + height, minChunk.maxX, minChunk.maxY));
-            spareSpace.add(AABB.newAABB(minChunk.minX + width, minChunk.minY, minChunk.maxX, minChunk.minY + height));
+            insertAABB(AABB.newAABB(minChunk.minX, minChunk.minY + height, minChunk.maxX, minChunk.maxY));
+            insertAABB(AABB.newAABB(minChunk.minX + width, minChunk.minY, minChunk.maxX, minChunk.minY + height));
         }
-        sortAABBs();
         return Optional.of(info);
     }
 
-    private void sortAABBs() {
-        spareSpace.sort((aabb1, aabb2) -> {
-            double width1 = aabb1.getWidth();
-            double width2 = aabb2.getWidth();
-            double height1 = aabb1.getHeight();
-            double height2 = aabb2.getHeight();
-            double add1 = width1 + height1;
-            double add2 = width2 + height2;
-            if (add1 != add2)
-                return (int) (add1 - add2);
-            if (width1 != width2)
-                return (int) (width1 - width2);
-            if (height1 != height2)
-                return (int) (height1 - height2);
-            return 0;
-        });
+    private void insertAABB(AABB now) {
+        int position = 0;
+        for (; position < spareSpace.size(); position++)
+            if (compareAABB(spareSpace.get(0), now))
+                break;
+        spareSpace.add(position, now);
+    }
+
+    private static boolean compareAABB(AABB aabb1, AABB aabb2) {
+        double width1 = aabb1.getWidth();
+        double width2 = aabb2.getWidth();
+        double height1 = aabb1.getHeight();
+        double height2 = aabb2.getHeight();
+        double add1 = width1 + height1;
+        double add2 = width2 + height2;
+        if (add1 != add2)
+            return add1 - add2 > 0;
+        if (width1 != width2)
+            return width1 - width2 > 0;
+        if (height1 != height2)
+            return height1 - height2 > 0;
+        return false;
     }
 
     public Image getImage() {

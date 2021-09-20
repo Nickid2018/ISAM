@@ -36,7 +36,6 @@ public class TextLabel extends TextComponent {
 
     @Override
     public void onResize(int sWidth, int sHeight, int reWidth, int reHeight) {
-        // TODO �Զ����ɵķ������
 
     }
 
